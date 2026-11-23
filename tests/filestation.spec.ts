@@ -276,6 +276,23 @@ describe("FileStation", () => {
     });
   });
 
+  it("reports a truncated listFolder response without including the response body", async () => {
+    const fs = new FileStation({ baseUrl: "https://nas.example.test", username: "u", password: "p" });
+    const text = '{"success":true,"data":{"files":[{"name":"synthetic-note"';
+    mockedRequestUrl.mockResolvedValueOnce({
+      status: 200,
+      headers: { "content-type": "application/json" },
+      text,
+      get json() {
+        throw new SyntaxError(`Cannot parse response: ${text}`);
+      },
+    });
+
+    await expect(fs.listFolder("/notes")).rejects.toThrow(
+      new Error("listFolder: invalid JSON from NAS (HTTP 200). Verify the File Station API endpoint."),
+    );
+  });
+
   describe("createFolderStrict", () => {
     function makeFs(): FileStation {
       const fs = new FileStation({ baseUrl: "https://nas.local:5001", username: "u", password: "p" });
