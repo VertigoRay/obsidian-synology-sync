@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### fix: Report malformed File Station JSON (`0975f29`) — Refs #118
+
+File Station operations now identify the operation and HTTP status when the NAS returns invalid JSON. The error directs users to verify the API endpoint and omits the response body.
+
 ## 2026.0602.1
 
 ### Added

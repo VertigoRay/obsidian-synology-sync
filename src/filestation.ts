@@ -416,18 +416,11 @@ export class FileStation {
       debugLog(`${label}: NAS returned HTML (status=${resp.status}); session may have expired`);
       throw new Error(`${label}: NAS returned an HTML page — session may have expired`);
     }
-    if (text) {
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        // Some test mocks supply only `json`. Fall back if parse of `text` failed.
-        const j = (resp as any).json;
-        if (j !== undefined) return j;
-        throw new Error(`${label}: invalid JSON from NAS: ${(e as Error).message}`);
-      }
+    try {
+      return text ? JSON.parse(text) : resp.json;
+    } catch {
+      throw new Error(`${label}: invalid JSON from NAS (HTTP ${resp.status}). Verify the File Station API endpoint.`);
     }
-    // No `text` — defer to whatever the runtime parsed.
-    return (resp as any).json;
   }
 
   async logout(): Promise<void> {
